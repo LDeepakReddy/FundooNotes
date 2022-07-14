@@ -35,8 +35,8 @@ Route::post('updateNotebyid',[NoteController::class,'updateNoteById']);
 Route::delete('deleteNoteById',[NoteController::class,'deleteNoteById']);
 
 Route::post('createLabel', [LabelController::class, 'createLabel']);
-Route::get('readLabel', [LabelController::class, 'readLabel']);
-Route::get('readLabelById', [LabelController::class, 'readLabelById']);
-Route::post('updateLabelById', [LabelController::class, 'updateLabelById']);
-Route::post('deleteLabelById', [LabelController::class, 'deleteLabelById']);
+Route::get('getLableById', [LabelController::class, 'getLableById']);
+Route::get('getAllLabel', [LabelController::class, 'getAllLabel']);
+Route::patch('updateLabelById', [LabelController::class, 'updateLabelById']);
+Route::delete('deleteLabelById', [LabelController::class, 'deleteLabelById']);
 });

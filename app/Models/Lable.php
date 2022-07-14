@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Lable extends Model
+class Lable extends Model implements JWTSubject
 {
     use HasFactory;
-
+    protected $table = "lables";
     protected $fillable = [
         'label_name',
         'user_id',
@@ -30,4 +31,10 @@ class Lable extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function note()
+    {
+        return $this->belongsTo(Notes::class);
+    }
+
+   
 }

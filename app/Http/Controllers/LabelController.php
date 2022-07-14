@@ -10,6 +10,7 @@ use App\Models\Lable;
 use App\Exceptions\FundooNotesException;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 
 //use PhpParser\Node\Stmt\Lable;
@@ -52,5 +53,165 @@ class LabelController extends Controller
             ], $exception->statusCode());
         }
     }
+
+    function getLableById(Request $request)
+    {
+        try {
+
+            $validator = Validator::make($request->only('id'), [
+                'id' => 'required'
+            ]);
+
+            //Send failed response if request is not valid
+            if ($validator->fails()) {
+                return response()->json(['error' => 'Invalid'], 400);
+            }
+
+            $currentUser = JWTAuth::authenticate($request->token);
+
+            if (!$currentUser) {
+                Log::error('Invalid Authorization Token');
+                throw new FundooNotesException('Invalid Authorization Token', 401);
+            }
+
+            $currentid = $currentUser->id;
+            $label = Lable::where('user_id', $currentid)->where('id', $request->id)->first();
+
+            if (!$label) {
+                Log::info('Label Not Found');
+                throw new FundooNotesException('Label Not Found', 404);
+            } else {
+                return response()->json(['label' => $label], 201);
+            }
+        } catch (FundooNotesException $exception) {
+            return response()->json([
+                'message' => $exception->message()
+            ], $exception->statusCode());
+        }
+    }
+
+    public function getAllLabel(Request $request)
+    {
+        try {
+            $user = JWTAuth::authenticate($request->token);
+            $label = Lable::all();
+
+            if (!$user) {
+                Log::error('Invalid Authorization Token');
+                throw new FundooNotesException('Invalid Authorization Token', 401);
+            }
+            $label = Lable::where('user_id', $user->id)->get();
+
+            if (!$label) {
+                Log::error('Label Not Found');
+                throw new FundooNotesException('Label Not Found', 404);
+            } else {
+                Log::info('Label Retrived Successfully');
+                return response()->json([
+                    'status' => 200,
+                    'label' => $label
+                ]);
+            }
+        } catch (FundooNotesException $exception) {
+            return response()->json([
+                'message' => $exception->message()
+            ], $exception->statusCode());
+        }
+    }
+
+
+    public function updateLabelById(Request $request)
+    {
+         try {
+            $validator = Validator::make($request->all(), [
+                'updated_label' => 'required|string|between:2,30',
+                'id' => 'required|integer',
+            ]);
+            // if ($validator->fails()) {
+            //     return response()->json($validator->errors()->toJson(), 400);
+            // }
+            if ($validator->fails()) {
+                return response()->json(['error' => 'Invalid'], 400);
+            }
+
+            $user = JWTAuth::authenticate($request->token);
+
+            if (!$user) {
+                Log::error('Invalid Authorization Token');
+                throw new FundooNotesException('Invalid Authorization Token', 401);
+            }
+
+            $label = Lable::where('user_id', $user->id)->where('id', $request->id)->first();
+           // return response()->json(['label' => $label], 200);
+
+            if (!$label) {
+                Log::error('Label Not Found');
+                throw new FundooNotesException('Label Not Found', 404);
+            }
+
+            $label->label_name = $request->updated_label;
+            // $label->user_id = $request->id;
+            $label->save();
+            
+            $label->update([
+                'label_name' => $request->updated_label,
+            
+            ]);
+            Cache::forget('labels');
+            Cache::forget('notes');
+
+            return response()->json([
+                'message' => 'label updated successfully',
+                'label' => $label,
+            ], 201);
+        } catch (FundooNotesException $exception) {
+            return response()->json([
+                'message' => $exception->message()
+            ], $exception->statusCode());
+         }
+    }
+
     
+    function deleteLabelById(Request $request)
+    {
+        try {
+
+            $validator = Validator::make($request->only('id'), [
+                'id' => 'required|integer'
+            ]);
+
+            //Send failed response if request is not valid
+            if ($validator->fails()) {
+                return response()->json(['error' => 'Invalid'], 400);
+            }
+
+            $currentUser = JWTAuth::authenticate($request->token);
+
+            if (!$currentUser) {
+                Log::error('Invalid Authorization Token');
+                throw new FundooNotesException('Invalid Authorization Token', 401);
+            }
+
+            $label = Lable::where('id', $request->id)->first();
+
+            if (!$label) {
+                Log::error('Label Not Found');
+                throw new FundooNotesException('Label Not Found', 404);
+            } else {
+                // Cache::forget('labels');
+                // Cache::forget('notes');
+
+                $label->delete($label->id);
+                return response()->json([
+                    'mesaage' => 'label deleted Successfully',
+                ], 200);
+            }
+        } catch (FundooNotesException $exception) {
+            return response()->json([
+                'message' => $exception->message()
+            ], $exception->statusCode());
+        }
+    }
+    
+
 }
