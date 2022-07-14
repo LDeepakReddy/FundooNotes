@@ -153,7 +153,7 @@ class NoteController extends Controller
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|between:2,30',
                 'description' => 'required|string|between:3,1000',
-                'id' => 'required',
+                'id' => 'required|integer',
             ]);
             if ($validator->fails()) {
                 return response()->json($validator->errors()->toJson(), 400);
@@ -162,7 +162,7 @@ class NoteController extends Controller
             $user = JWTAuth::authenticate($request->token);
 
             if (!$user) {
-                Log::channel('customLog')->error('Invalid User');
+
                 throw new FundooNotesException('Invalid Authorization Token', 401);
             }
 
@@ -172,13 +172,15 @@ class NoteController extends Controller
                 throw new FundooNotesException('Notes Not Found', 404);
             }
 
-            $note->update([
-                'title' => $request->title,
-                'description' => $request->description,
-                'user_id' => $user->id,
-            ]);
+            // $note->update([
+            //     'title' => $request->title,
+            //     'description' => $request->description,
+            //     'user_id' => $user->id,
+            // ]);
+            $note->title = $request->title;
+            $note->description = $request->description;
+            $note->save();
 
-            Log::channel('customLog')->info('Note updated', ['user_id' => $user->id]);
             return response()->json([
                 'status' => 200,
                 'note' => $note,

@@ -31,7 +31,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::post('createNote', [NoteController::class, 'createNote']);
     Route::post('getNoteById',[NoteController::class,'getNoteById']);
 Route::get('getAllNotes',[NoteController::class,'getAllNotes']);
-Route::patch('updateNotebyid',[NoteController::class,'updateNoteById']);
+Route::post('updateNotebyid',[NoteController::class,'updateNoteById']);
 Route::delete('deleteNoteById',[NoteController::class,'deleteNoteById']);
 
 Route::post('createLabel', [LabelController::class, 'createLabel']);

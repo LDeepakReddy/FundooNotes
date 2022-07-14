@@ -65,15 +65,7 @@ class Note extends Model  implements JWTSubject
 
     public static function getAllNotes($user)
     {
-        // $notes = Note::leftJoin('labelnotes', 'labelnotes.note_id', '=', 'notes.id')
-        //     ->leftJoin('labels', 'labels.id', '=', 'labelnotes.label_id')
-        //     ->leftjoin('collaborators','collaborators.note_id', '=', 'notes.id')
-        //     ->select('notes.id', 'notes.title', 'notes.description', 'notes.pin', 'notes.archive', 'notes.colour', 'labels.label_name', 'collaborators.email as collaborator')
-        //     ->where([['notes.user_id', '=', $user->id], ['archive', '=', 0], ['pin', '=', 0]])->get();
-        //     //->orWhere([['archive', '=', 0], ['pin', '=', 0],['collaborators.email', '=', $user->email]])
-        //     //->get();
         
-        // return $notes;
 
         $notes = User::leftjoin('notes','notes.user_id', '=', 'users.id')
         ->select('users.id','notes.id', 'notes.title', 'notes.description')

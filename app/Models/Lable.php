@@ -26,34 +26,8 @@ class Lable extends Model
         return [];
     }
 
-    public function user_id()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
-    public static function getLabelByLabelIdandUserId($label_id, $user_id)
-    {
-        $label = Label::where('id', $label_id)->where('user_id', $user_id)->first();
-        return $label;
-    }
-
-    /**
-     * Function to get label by the label_name and user_id
-     * passing label_name and user_id as parameters
-     * 
-     * @return array
-     */
-    public static function getLabelByLabelNameandUserId($label_name, $user_id)
-    {
-        $label = Label::where('labelname', $label_name)->where('user_id', $user_id)->first();
-        return $label;
-    }
-}
-
 }

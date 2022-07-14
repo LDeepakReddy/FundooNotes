@@ -251,6 +251,12 @@ class UserController extends Controller
      *   summary="get_user",
      *   description="get_user",
      *   @OA\RequestBody(
+     *  @OA\Schema(
+     *            type="object",
+     *             required={"token"},
+     *             @OA\Property(property="token", type="string"),
+     * ),
+     *        ),
      *    ),
      *   @OA\Response(response=201, description="Found User successfully"),
      *   @OA\Response(response=401, description="User cannot be found"),
@@ -329,17 +335,17 @@ class UserController extends Controller
 
             $token = JWTAuth::fromUser($user);
             $data = array('name' => "$user->firstname;", "resetlink" => $token);
-            
+
 
 
             // Mail::send('mail', $data, function ($message) {
             //     $message->to(env('MAIL_USERNAME'), 'name')->subject('Reset Password');
             //     $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
             // });
-            Mail::send('mail', $data, function($message) {
+            Mail::send('mail', $data, function ($message) {
                 $message->to('depaknb5@gmail.com', 'Deepak')->subject('Reset Password');
-                $message->from('depaknb5@gmail.com','Laravel');
-             });
+                $message->from('depaknb5@gmail.com', 'Laravel');
+            });
 
             return response()->json([
                 'message' => 'Reset link Sent to your Email',
@@ -393,18 +399,18 @@ class UserController extends Controller
         $user = User::where('email', $user->email)->first();
 
         if (!$user) {
-           
+
             return response()->json([
                 'message' => " can't find the user with that e-mail address"
             ], 400);
         } else {
             $user->password = bcrypt($request->new_password);
             $user->save();
-            
+
             return response()->json([
                 'status' => 200,
                 'message' => 'Password reset successfull!'
             ], 200);
         }
-    }    
+    }
 }

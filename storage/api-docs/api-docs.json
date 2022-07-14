@@ -5,6 +5,55 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/createnote": {
+            "post": {
+                "summary": "create note",
+                "description": "create note",
+                "operationId": "ac1b3ae4b2f77f1b6e72499a395d033a",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "description"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "label_id": {},
+                                    "pin": {},
+                                    "archive": {},
+                                    "colour": {},
+                                    "collaborator_email": {}
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Note created Sucessfully"
+                    },
+                    "401": {
+                        "description": "Invalid token"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
         "/api/register": {
             "post": {
                 "summary": "register",
@@ -96,10 +145,10 @@
             }
         },
         "/api/logout": {
-            "post": {
+            "get": {
                 "summary": "logout",
                 "description": "logout",
-                "operationId": "67d5147477c548bfbc3f982833bbc7bd",
+                "operationId": "8992dd4fbd21ecd6bd79f84228dc98cf",
                 "requestBody": {
                     "content": {
                         "multipart/form-data": {

@@ -69,6 +69,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasmany('App\Models\Label');
     }
+    public static function getUserByEmail($email){
+        $user = User::where('email', $email)->first();
+        return $user;
+    }
 
    
 }
