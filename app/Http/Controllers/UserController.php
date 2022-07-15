@@ -60,32 +60,7 @@ class UserController extends Controller
      *@return \Illuminate\Http\JsonResponse
      */
 
-    // function register(Request $request)
-    // {
-
-    //     $validator = Validator::make($request->all(), [
-    //         'firstname' => 'required|string|between:2,100',
-    //         'lastname' => 'required|string|between:2,100',
-    //         'email' => 'required|string|email|max:150',
-    //         'password' => 'required|string|min:6',
-    //         'password_confirmation' => 'required|same:password'
-    //     ]);
-    //     if ($validator->fails()) {
-    //         return response()->json($validator->errors()->toJson(), 400);
-    //     }
-    //     $user = User::create([
-    //         'firstname' => $request->firstname,
-    //         'lastname' => $request->lastname,
-    //         'email' => $request->email,
-    //         'password' => bcrypt($request->password),
-    //     ]);
-
-    //     return response()->json([
-    //         'message' => 'User successfully registered',
-    //         'user' => $user
-    //     ], 201);
-    // }
-
+   
     function register(Request $request)
     {
         try {
@@ -151,43 +126,53 @@ class UserController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
 
+   
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-
-        //valid credential
-        $validator = Validator::make($credentials, [
-            'email' => 'required|email',
-            'password' => 'required|string|min:6|max:50'
-        ]);
-
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
-        }
-
-        //Request is validated
-        //Crean token
         try {
+
+            $credentials = $request->only('email', 'password');
+
+            //valid credential
+            $validator = Validator::make($credentials, [
+                'email' => 'required|email',
+                'password' => 'required|string|min:6|max:50'
+            ]);
+
+            //Send failed response if request is not valid
+            if ($validator->fails()) {
+                return response()->json(['error' => 'Invalid credentials entered'], 400);
+            }
+
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                Log::error('Not a Registered Email');
+                throw new FundooNotesException('Not a Registered Email', 404);
+                return response()->json([
+                    'message' => 'Email is not registered',
+                ], 404);
+             }
+           
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Login credentials are invalid.',
                 ], 400);
             }
-        } catch (JWTException $e) {
-            return $credentials;
-            return response()->json([
-                'success' => false,
-                'message' => 'Could not create token.',
-            ], 500);
-        }
 
-        //Token created, return with success response and jwt token
-        return response()->json([
-            'success' => true,
-            'token' => $token,
-        ]);
+            //Token created, return with success response and jwt token
+            Log::info('Login Successful');
+            return response()->json([
+                'success' => true,
+                'message' => 'Login successful',
+                'token' => $token,
+            ], 200);
+        } catch (FundooNotesException $exception) {
+            return response()->json([
+                'message' => $exception->message()
+            ], $exception->statusCode());
+        }
     }
 
     /**
@@ -219,29 +204,20 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
-        //valid credential
-        $validator = Validator::make($request->only('token'), [
-            'token' => 'required'
-        ]);
+        $user = JWTAuth::authenticate($request->token);
 
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
-        }
-
-        //Request is validated, do logout        
-        try {
+        if (!$user) {
+            log::warning('Invalid Authorisation ');
+            return response()->json([
+                'message' => 'Invalid token'
+            ], 401);
+        } else {
             JWTAuth::invalidate($request->token);
-
+            log::info('User successfully logged out');
             return response()->json([
                 'success' => true,
                 'message' => 'User has been logged out'
-            ]);
-        } catch (JWTException $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Sorry, user cannot be logged out'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            ], 200);
         }
     }
 
@@ -382,35 +358,37 @@ class UserController extends Controller
      * is there or not if not returns a failure response and checks the user email also if everything is
      * ok it will reset the password successfully.
      */
+
+
     public function resetPassword(Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            'new_password' => 'min:6|required|',
-            'password_confirmation' => 'required|same:new_password'
-        ]);
+        try {
 
-        if ($validate->fails()) {
+            $validator = Validator::make($request->all(), [
+                'new_password' => 'required|string|min:6|max:50',
+                'password_confirmation' => 'required|same:new_password',
+            ]);
+
+            //Send failed response if request is not valid
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
+            $currentUser = JWTAuth::authenticate($request->token);
+
+            if (!$currentUser) {
+                log::warning('Invalid Authorisation Token ');
+                throw new FundooNotesException('Invalid Authorization Token', 401);
+            } else {
+                $user = User::updatePassword($currentUser, $request->new_password);
+                log::info('Password updated successfully');
+                return response()->json([
+                    'message' => 'Password Reset Successful'
+                ], 201);
+            }
+        } catch (FundooNotesException $exception) {
             return response()->json([
-                'message' => "Password doesn't match"
-            ], 400);
-        }
-        $user = Auth::user();
-
-        $user = User::where('email', $user->email)->first();
-
-        if (!$user) {
-
-            return response()->json([
-                'message' => " can't find the user with that e-mail address"
-            ], 400);
-        } else {
-            $user->password = bcrypt($request->new_password);
-            $user->save();
-
-            return response()->json([
-                'status' => 200,
-                'message' => 'Password reset successfull!'
-            ], 200);
+                'message' => $exception->message()
+            ], $exception->statusCode());
         }
     }
 }

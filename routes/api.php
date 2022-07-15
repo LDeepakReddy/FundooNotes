@@ -37,6 +37,6 @@ Route::delete('deleteNoteById',[NoteController::class,'deleteNoteById']);
 Route::post('createLabel', [LabelController::class, 'createLabel']);
 Route::get('getLableById', [LabelController::class, 'getLableById']);
 Route::get('getAllLabel', [LabelController::class, 'getAllLabel']);
-Route::patch('updateLabelById', [LabelController::class, 'updateLabelById']);
+Route::post('updateLabelById', [LabelController::class, 'updateLabelById']);
 Route::delete('deleteLabelById', [LabelController::class, 'deleteLabelById']);
 });

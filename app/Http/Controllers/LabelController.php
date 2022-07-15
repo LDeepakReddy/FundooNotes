@@ -153,12 +153,12 @@ class LabelController extends Controller
             // $label->user_id = $request->id;
             $label->save();
             
-            $label->update([
-                'label_name' => $request->updated_label,
+            // $label->update([
+            //     'label_name' => $request->updated_label,
             
-            ]);
-            Cache::forget('labels');
-            Cache::forget('notes');
+            // ]);
+            // Cache::forget('labels');
+            // Cache::forget('notes');
 
             return response()->json([
                 'message' => 'label updated successfully',
@@ -198,9 +198,7 @@ class LabelController extends Controller
                 Log::error('Label Not Found');
                 throw new FundooNotesException('Label Not Found', 404);
             } else {
-                // Cache::forget('labels');
-                // Cache::forget('notes');
-
+               
                 $label->delete($label->id);
                 return response()->json([
                     'mesaage' => 'label deleted Successfully',

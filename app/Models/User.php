@@ -74,5 +74,29 @@ class User extends Authenticatable implements JWTSubject
         return $user;
     }
 
+    /**
+     * Mutator for first name : first letter of first name will changed to upper case 
+     */
+    public function setFirstNameAttribute($value)
+    {
+        $this->attributes['firstname'] = ucfirst($value);
+    }
+
+    /**
+     * Mutator for last name : first letter of last name will changed to upper case
+     */
+    public function setLastNameAttribute($value)
+    {
+        $this->attributes['lastname'] = ucfirst($value);
+    }
+
+    /**
+     * Accessor for first name : Mr/s. will be added while displaying
+     */
+    public function getFirstNameAttribute($value)
+    {
+        return 'Mr/s. ' . ucfirst($value);
+    }
+
    
 }
