@@ -152,13 +152,6 @@ class LabelController extends Controller
             $label->label_name = $request->updated_label;
             // $label->user_id = $request->id;
             $label->save();
-            
-            // $label->update([
-            //     'label_name' => $request->updated_label,
-            
-            // ]);
-            // Cache::forget('labels');
-            // Cache::forget('notes');
 
             return response()->json([
                 'message' => 'label updated successfully',

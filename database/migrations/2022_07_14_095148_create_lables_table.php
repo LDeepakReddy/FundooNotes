@@ -14,15 +14,16 @@ class CreateLablesTable extends Migration
     public function up()
     {
         Schema::create('lables', function (Blueprint $table) {
-            
-                $table->increments('id');
-                $table->string('label_name');
-                $table->unsignedBigInteger('user_id');
-                $table->foreign('user_id')->references('id')->on('users')
-                    ->onDelete('cascade')
-                    ->onUpdate('cascade');
-                $table->rememberToken();
-                $table->timestamps();
+            $table->increments('id');
+            $table->string('labelname');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->rememberToken();
+            $table->timestamps();
         });
     }
 

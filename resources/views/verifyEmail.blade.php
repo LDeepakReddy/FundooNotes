@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -5,8 +7,10 @@
     <title>Document</title>
 </head>
 <body>
-<h1>Hi, {{ $email }}</h1>
-<h3> {{ $token }} </h3>
-<p>Sending Mail from Laravel.</p>
+    <p>Verify your Email<p>
+<h1>Hi, {{ $name }}</h1>
+<p>Verify your Email<p>
+<a href=>{{ $VerificationLink }} </a>
+<p>Sending Mail from Deepak.</p>
 </body>
 </html>

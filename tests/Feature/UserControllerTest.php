@@ -26,11 +26,11 @@ class UserControllerTest extends TestCase
             'Content-Type' => 'Application/json',
         ])
             ->json('POST', '/api/register', [
-                "firstname" => "Dhoni",
-                "lastname" => "singh",
-                "email" => "dhonims@gmail.com",
-                "password" => "dhoni@123",
-                "password_confirmation" => "dhoni@123"
+                "firstname" => "rohit",
+                "lastname" => "shrma",
+                "email" => "rohit123@gmail.com",
+                "password" => "rohit@123",
+                "password_confirmation" => "rohit@123"
             ]);
         $response->assertStatus(201)->assertJson(['message' => 'User successfully registered']);
     }
@@ -57,8 +57,8 @@ class UserControllerTest extends TestCase
         ])
             ->json('POST', '/api/login',
                 [
-                    "email" => "virat@gmail.com",
-                    "password" => "virat@123"
+                    "email" => "rohit123@gmail.com",
+                    "password" => "rohit@123"
                 ]
             );
         $response->assertStatus(200)->assertJson(['message' => 'Login successful']);

@@ -27,12 +27,15 @@ Route::post('forgotPassword', [UserController::class, 'forgotPassword']);
 Route::group(['middleware' => ['jwt.verify']], function () {
     Route::get('logout', [UserController::class, 'logout']);
     Route::get('get_user', [UserController::class, 'get_user']);
+    Route::post('verifyMail', [UserController::class, 'verifyMail']);
     Route::post('resetPassword', [UserController::class, 'resetPassword']);
     Route::post('createNote', [NoteController::class, 'createNote']);
     Route::post('getNoteById',[NoteController::class,'getNoteById']);
 Route::get('getAllNotes',[NoteController::class,'getAllNotes']);
 Route::post('updateNotebyid',[NoteController::class,'updateNoteById']);
 Route::delete('deleteNoteById',[NoteController::class,'deleteNoteById']);
+Route::post('addNoteLabel', [NoteController::class, 'addNoteLabel']);
+Route::post('searchNotes',[NoteController::class,'searchNotes']);
 
 Route::post('createLabel', [LabelController::class, 'createLabel']);
 Route::get('getLableById', [LabelController::class, 'getLableById']);

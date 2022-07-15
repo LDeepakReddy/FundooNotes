@@ -60,11 +60,14 @@ class UserController extends Controller
      *@return \Illuminate\Http\JsonResponse
      */
 
-   
+
     function register(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
+            $credentials = $request->only('firstname', 'lastname', 'email', 'password', 'password_confirmation');
+
+            //valid credential
+            $validator = Validator::make($credentials, [
                 'firstname' => 'required|string|between:2,100',
                 'lastname' => 'required|string|between:2,100',
                 'email' => 'required|string|email|max:150',
@@ -88,6 +91,21 @@ class UserController extends Controller
                 'password' => bcrypt($request->password),
             ]);
 
+            $token = JWTAuth::attempt($credentials);
+
+            $data = array('name' => "$user->firstname;", "VerificationLink" => $token);
+
+            // Mail::send('verifyEmail', $data, function ($message) {
+            //     $message->to(env('MAIL_USERNAME'), 'name')->subject('verify Email');
+            //     $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+            // });
+            Mail::send('verifyEmail', $data, function ($message) {
+                $message->to('depaknb5@gmail.com', 'Deepak')->subject('Verify Email');
+                $message->from('depaknb5@gmail.com', 'Laravel');
+            });
+
+
+
             return response()->json([
                 'message' => 'User successfully registered',
                 'user' => $user
@@ -98,6 +116,8 @@ class UserController extends Controller
             ], $exception->statusCode());
         }
     }
+
+
 
 
 
@@ -126,7 +146,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
 
-   
+
     public function login(Request $request)
     {
         try {
@@ -152,8 +172,8 @@ class UserController extends Controller
                 return response()->json([
                     'message' => 'Email is not registered',
                 ], 404);
-             }
-           
+            }
+
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json([
                     'success' => false,
@@ -326,6 +346,38 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'Reset link Sent to your Email',
             ], 201);
+        }
+    }
+
+    public function verifyMail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email'
+        ]);
+
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        $user = User::where('email', $request->email)->first();
+        $user = JWTAuth::authenticate($request->token);
+
+        if (!$user) {
+            log::warning('Invalid Authorisation Token ');
+
+            throw new FundooNotesException('Invalid Authorization Token', 401);
+        }
+        $time = $user->email_verified_at;
+        if (!$time) {
+            if (!$user) {
+                return response()->json(['not found'], 220);
+            }
+
+            $user->email_verified_at = now();
+            $user->save();
+            return response()->json(['verified successfully'], 201);
+        } else {
+            return response()->json(['already verified'], 222);
         }
     }
 

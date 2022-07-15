@@ -6,43 +6,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Note;
+use Illuminate\Support\Facades\Cache;
+use App\Models\LabelNotes;
 use Illuminate\Support\Facades\Log;
 use App\Exceptions\FundooNotesException;
+
 class NoteController extends Controller
 {
 
-     /**
-     * @OA\Post(
-     *   path="/api/createnote",
-     *   summary="create note",
-     *   description="create note",
-     *   @OA\RequestBody(
-     *         @OA\JsonContent(),
-     *         @OA\MediaType(
-     *            mediaType="multipart/form-data",
-     *            @OA\Schema(
-     *               type="object",
-     *               required={"title","description"},
-     *               @OA\Property(property="title", type="string"),
-     *               @OA\Property(property="description", type="string"),
-     *               @OA\Property(property="label_id"),  
-     *               @OA\Property(property="pin"),  
-     *               @OA\Property(property="archive"),  
-     *               @OA\Property(property="colour"),
-     *               @OA\Property(property="collaborator_email")         
-     *            ),
-     *        ),
-     *    ),
-     *   @OA\Response(response=200, description="Note created Sucessfully"),
-     *   @OA\Response(response=401, description="Invalid token"),
-     * security={
-     *       {"Bearer": {}}
-     *     }
-     * )
-     * Create Note.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     function createNote(Request $request)
     {
         try {
@@ -232,9 +204,88 @@ class NoteController extends Controller
         }
     }
 
-    
+    public function addNoteLabel(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
 
-    
-    
+            'note_id' => 'required',
+            'label_id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $user = JWTAuth::parseToken()->authenticate();
+        if (!$user) {
+            return response()->json([
+                'status' => 401,
+                'message' => 'Invalid authorization token'
+            ], 401);
+        }
+
+        $labelnote = LabelNotes::where('note_id', $request->note_id)->where('label_id', $request->label_id)->first();
+        if ($labelnote) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Note Already have a label'
+            ], 409);
+        }
+
+        //$notelabel = LabelNotes::createNoteLabel($request, $user->id);
+        $labelnotes = LabelNotes::create([
+            'user_id' => $user->id,
+            'note_id' => $request->note_id,
+            'label_id' => $request->label_id
+        ]);
+        log::info('Label created Successfully');
+        return response()->json([
+            'status' => 200,
+            'message' => 'Label and note added Successfully',
+            'notelabel' => $labelnotes,
+        ]);
+    }
+
+
+
+
+
+    public function searchNotes(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'search' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+        $searchKey = $request->input('search');
+        $currentUser = JWTAuth::parseToken()->authenticate();
+
+        if ($currentUser) {
+
+            $usernotes = Note::leftJoin('label_notes', 'label_notes.note_id', '=', 'notes.id')->leftJoin('lables', 'lables.id', '=', 'label_notes.label_id')
+                ->select('notes.id', 'notes.title', 'notes.description', 'lables.label_name')
+                ->where('notes.user_id', '=', $currentUser->id)->Where('notes.title', 'like', '%' . $searchKey . '%')
+                ->orWhere('notes.user_id', '=', $currentUser->id)->Where('notes.description', 'like', '%' . $searchKey . '%')
+                ->orWhere('notes.user_id', '=', $currentUser->id)->Where('lables.label_name', 'like', '%' . $searchKey . '%')->get();
+
+            if ($usernotes == '[]') {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'No results'
+                ], 404);
+            }
+            return response()->json([
+                'status' => 201,
+                'message' => 'Fetched Notes Successfully',
+                'notes' => $usernotes
+            ], 201);
+        }
+        return response()->json([
+            'status' => 403,
+            'message' => 'Invalid authorization token'
+        ], 403);
+    }
 }
-    
