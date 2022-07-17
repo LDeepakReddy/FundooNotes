@@ -78,7 +78,13 @@ class User extends Authenticatable implements JWTSubject
         $user = User::where('email', $email)->first();
         return $user;
     }
-
+ /**
+     * Accessor for first name : Mr/s. will be added while displaying
+     */
+    public function getFirstNameAttribute($value)
+    {
+        return 'Mr/s. ' .  $this->attributes['firstname'] = ucfirst($value);
+    }
     /**
      * Mutator for first name : first letter of first name will changed to upper case 
      */
@@ -95,13 +101,7 @@ class User extends Authenticatable implements JWTSubject
         $this->attributes['lastname'] = ucfirst($value);
     }
 
-    /**
-     * Accessor for first name : Mr/s. will be added while displaying
-     */
-    public function getFirstNameAttribute($value)
-    {
-        return 'Mr/s. ' . ucfirst($value);
-    }
+   
 
    
 }

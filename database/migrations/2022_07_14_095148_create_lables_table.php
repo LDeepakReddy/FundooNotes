@@ -22,7 +22,6 @@ class CreateLablesTable extends Migration
                 ->on('users')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-            $table->rememberToken();
             $table->timestamps();
         });
     }

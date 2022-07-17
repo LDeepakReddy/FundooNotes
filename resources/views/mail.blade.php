@@ -9,6 +9,6 @@
 <body>
 <h1>Hi, {{ $name }}</h1>
 <h3> {{ $resetlink }} </h3>
-<p>Sending Mail from Deepak.</p>
+<p>Sending Mail from Laravel.</p>
 </body>
 </html>

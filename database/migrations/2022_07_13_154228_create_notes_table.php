@@ -24,7 +24,6 @@ class CreateNotesTable extends Migration
                 ->on('users')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-            $table->rememberToken();
             $table->timestamps();
             
 

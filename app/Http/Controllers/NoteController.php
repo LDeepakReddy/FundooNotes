@@ -283,6 +283,7 @@ class NoteController extends Controller
                 'notes' => $usernotes
             ], 201);
         }
+        Log::error('Invalid Authorization Token');
         return response()->json([
             'status' => 403,
             'message' => 'Invalid authorization token'

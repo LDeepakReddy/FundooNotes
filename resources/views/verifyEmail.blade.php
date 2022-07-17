@@ -7,10 +7,10 @@
     <title>Document</title>
 </head>
 <body>
-    <p>Verify your Email<p>
+   
 <h1>Hi, {{ $name }}</h1>
-<p>Verify your Email<p>
-<a href=>{{ $VerificationLink }} </a>
-<p>Sending Mail from Deepak.</p>
+<h5>Verify your Email<h5>
+<h4>{{ $VerificationLink }} </h4>
+<p>Sending Mail from Laravel.</p>
 </body>
 </html>

@@ -30,7 +30,8 @@ class Note extends Model  implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    public function getJWTIdentifier() {
+    public function getJWTIdentifier()
+    {
         return $this->getKey();
     }
     /**
@@ -38,7 +39,8 @@ class Note extends Model  implements JWTSubject
      *
      * @return array
      */
-    public function getJWTCustomClaims() {
+    public function getJWTCustomClaims()
+    {
         return [];
     }
 
@@ -52,28 +54,30 @@ class Note extends Model  implements JWTSubject
         return $this->belongsTo(User::class);
     }
 
-    
+
     public static function getNotesByNoteIdandUserId($id, $user_id)
     {
         $notes = Note::where('id', $id)->where('user_id', $user_id)->first();
         return $notes;
     }
-    
-    public function noteId($id) {
+
+    public function noteId($id)
+    {
         return Note::where('id', $id)->first();
     }
 
+    
     public static function getAllNotes($user)
     {
-        
+        $note = User::leftjoin('notes', 'notes.user_id', '=', 'users.id')
+            ->leftJoin('label_notes', 'label_notes.note_id', '=', 'notes.id')
+            ->leftJoin('lables', 'lables.id', '=', 'label_notes.label_id')
 
-        $notes = User::leftjoin('notes','notes.user_id', '=', 'users.id')
-        ->select('users.id','notes.id', 'notes.title', 'notes.description')
-        ->where([['notes.user_id', '=', $user->id]])
-        ->get();
-
-        return $notes;
+            ->select('users.id', 'notes.id', 'notes.title', 'notes.description', 'lables.label_name')
+            ->where([['notes.user_id', '=', $user->id]])
+            ->get();
 
 
-}
+        return $note;
+    }
 }
