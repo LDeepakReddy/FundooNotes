@@ -14,6 +14,35 @@ use App\Exceptions\FundooNotesException;
 class NoteController extends Controller
 {
 
+      /**
+     * @OA\Post(
+     *   path="/api/createNote",
+     *   summary="create note",
+     *   description="create note",
+     *   @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="multipart/form-data",
+     *            @OA\Schema(
+     *               type="object",
+     *               required={"title","description"},
+     *               @OA\Property(property="title", type="string"),
+     *               @OA\Property(property="description", type="string"),
+     *               @OA\Property(property="label_id")
+     *                      
+     *            ),
+     *        ),
+     *    ),
+     *   @OA\Response(response=200, description="Note created Sucessfully"),
+     *   @OA\Response(response=401, description="Invalid token"),
+     * security={
+     *       {"Bearer": {}}
+     *     }
+     * )
+     * Create Note.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
 
     function createNote(Request $request)
     {
@@ -54,7 +83,31 @@ class NoteController extends Controller
         }
     }
 
-
+    /**
+     * @OA\Post(
+     *   path="/api/getNoteById",
+     *   summary="get Note",
+     *   description=" get Note ",
+     *   @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="multipart/form-data",
+     *            @OA\Schema(
+     *               type="object",
+     *               required={"id"},
+     *               @OA\Property(property="id", type="integer"),
+     *            ),
+     *        ),
+     *    ),
+     *   @OA\Response(response=201, description="Note found Sucessfully"),
+     *   @OA\Response(response=404, description="Notes not Found"),
+     *   security={
+     *       {"Bearer": {}}
+     *     }
+     * )
+     * Read note by id
+     * @return \Illuminate\Http\JsonResponse
+     */
     function getNoteById(Request $request)
     {
 
@@ -89,6 +142,25 @@ class NoteController extends Controller
     }
 
 
+    /**
+     *   @OA\Get(
+     *   path="/api/getAllNotes",
+     *   summary="get notes",
+     *   description="user get notes",
+     *   @OA\RequestBody(
+     *    ),
+     *   @OA\Response(response=201, description="Notes shown suucessfully"),
+     *   @OA\Response(response=401, description="No note created by this user"),
+     *   security={
+     *       {"Bearer": {}}
+     *     }
+     * )
+     * This function takes access token and note id and finds
+     * if there is any note existing on that User id and note id if so
+     * it successfully returns that note id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     function getAllNotes(Request $request)
     {
         try {
@@ -118,7 +190,37 @@ class NoteController extends Controller
         }
     }
 
-
+     /**
+     *   @OA\Post(
+     *   path="/api/updateNotebyid",
+     *   summary="update note",
+     *   description="update user note",
+     *   @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="multipart/form-data",
+     *            @OA\Schema(
+     *               type="object",
+     *               required={"Updated_title","Updated_description","id"},
+     *               @OA\Property(property="Updated_title", type="string"),
+     *               @OA\Property(property="Updated_description", type="string"),
+     *               @OA\Property(property="id"),
+     *            ),
+     *        ),
+     *    ),
+     *   @OA\Response(response=200, description="Note successfully updated"),
+     *   @OA\Response(response=402, description="Notes not found"),
+     *   @OA\Response(response=401, description="Invalid authorization token"),
+     *   security={
+     *       {"Bearer": {}}
+     *     }
+     * )
+     * This function takes the User access token and note id which
+     * user wants to update and finds the note id if it is existed
+     * or not if so, updates it successfully.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updateNoteById(Request $request)
     {
         try {
@@ -165,6 +267,35 @@ class NoteController extends Controller
         }
     }
 
+     /**
+     *   @OA\Delete(
+     *   path="/api/deleteNoteById",
+     *   summary="delete note",
+     *   description="delete user note",
+     *   @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="multipart/form-data",
+     *            @OA\Schema(
+     *               type="object",
+     *               required={"id"},
+     *               @OA\Property(property="id", type="integer"),
+     *            ),
+     *        ),
+     *    ),
+     *   @OA\Response(response=200, description="Note successfully deleted"),
+     *   @OA\Response(response=404, description="Notes not found"),
+     *   @OA\Response(response=401, description="Invalid authorization token"),
+     *   security={
+     *       {"Bearer": {}}
+     *     }
+     * )
+     * This function takes the User access token and note id which
+     * user wants to delete and finds the note id if it is existed
+     * or not if so, deletes it successfully.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     function deleteNoteById(Request $request)
     {
 
@@ -204,6 +335,36 @@ class NoteController extends Controller
         }
     }
 
+    /**
+     *   @OA\Post(
+     *   path="/api/addNoteLabel",
+     *   summary="Add note label",
+     *   description="Adiing note label",
+     *   @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="multipart/form-data",
+     *            @OA\Schema(
+     *               type="object",
+     *               required={"label_id","note_id"},
+     *               @OA\Property(property="label_id", type="string"),
+     *               @OA\Property(property="note_id", type="string"),
+     *            ),
+     *        ),
+     *    ),
+     *   @OA\Response(response=200, description="Note successfully updated"),
+     *   @OA\Response(response=402, description="Notes not found"),
+     *   @OA\Response(response=401, description="Invalid authorization token"),
+     *   security={
+     *       {"Bearer": {}}
+     *     }
+     * )
+     * This function takes the User access token and note id which
+     * user wants to update and finds the note id if it is existed
+     * or not if so, updates it successfully.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function addNoteLabel(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -248,7 +409,36 @@ class NoteController extends Controller
 
 
 
-
+/**
+     * @OA\Post(
+     *   path="/api/searchNotes",
+     *   summary="Search Note",
+     *   description=" Search Note ",
+     *   @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="multipart/form-data",
+     *            @OA\Schema(
+     *               type="object",
+     *               required={"search"},
+     *               @OA\Property(property="search", type="string")
+     *            ),
+     *        ),
+     *    ),
+     *   @OA\Response(response=200, description="Note Fetched Sucessfully"),
+     *   @OA\Response(response=404, description="Notes Not Found"),
+     *   @OA\Response(response=401, description="Invalid Authorization Token"),
+     *   security = {
+     *      {"Bearer" : {}}
+     *   }
+     * )
+     * 
+     * This function takes the User access token and search key 
+     * if the access token is valid, it returns all the notes 
+     * which has given search key for that particular user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
 
     public function searchNotes(Request $request)
     {

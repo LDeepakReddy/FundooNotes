@@ -345,7 +345,7 @@ class UserController extends Controller
         } else {
 
             $token = JWTAuth::fromUser($user);
-            $data = array('name' => $user->firstname, "resetlink" => $token,
+            $data = array('name' => $user->firstname, "resetlink" => 'http://localhost:4200/resetPassword/'. $token,
             "email"=>$request->email,
             "fromMail"=>env('MAIL_USERNAME'),
             "fromName"=>env('APP_NAME'),
