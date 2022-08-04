@@ -66,6 +66,38 @@ class Note extends Model  implements JWTSubject
         return Note::where('id', $id)->first();
     }
 
+     /**
+     * Function to get the pinned notes and their labels
+     * Passing the user as a parameter
+     * 
+     * @return array
+     */
+    public static function getPinnedNotesandItsLabels($user)
+    {
+        $notes = Note::leftJoin('label_notes', 'label_notes.note_id', '=', 'notes.id')
+            ->leftJoin('lables', 'lables.id', '=', 'label_notes.label_id')
+            ->select('notes.id', 'notes.title', 'notes.description', 'notes.pin', 'notes.archive', 'notes.colour', 'lables.label_name')
+            ->where([['notes.user_id', '=', $user->id], ['pin', '=', 1]]) ->get();
+
+        return $notes;
+    }
+
+     /**
+     * Function to get the archived notes and their labels
+     * Passing the user as a parameter
+     * 
+     * @return array
+     */
+    public static function getArchivedNotesandItsLabels($user)
+    {
+        $notes = Note::leftJoin('label_notes', 'label_notes.note_id', '=', 'notes.id')
+            ->leftJoin('lables', 'lables.id', '=', 'label_notes.label_id')
+            ->select('notes.id', 'notes.title', 'notes.description', 'notes.pin', 'notes.archive', 'notes.colour', 'lables.label_name')
+            ->where([['notes.user_id', '=', $user->id], ['archive', '=', 1]]) ->get();
+
+        return $notes;
+    }
+
     
     public static function getAllNotes($user)
     {
@@ -73,8 +105,8 @@ class Note extends Model  implements JWTSubject
             ->leftJoin('label_notes', 'label_notes.note_id', '=', 'notes.id')
             ->leftJoin('lables', 'lables.id', '=', 'label_notes.label_id')
 
-            ->select('users.id', 'notes.id', 'notes.title', 'notes.description', 'lables.label_name')
-            ->where([['notes.user_id', '=', $user->id]])
+            ->select('users.id', 'notes.id', 'notes.title', 'notes.description', 'notes.pin', 'notes.archive', 'notes.colour', 'lables.label_name')
+            ->where([['notes.user_id', '=', $user->id],['archive', '=', 0], ['pin', '=', 0]])
             ->get();
 
 
