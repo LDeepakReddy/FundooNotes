@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPinToNotes extends Migration
+class AddColourToNotes extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddPinToNotes extends Migration
     public function up()
     {
         Schema::table('notes', function (Blueprint $table) {
-            $table->boolean('pin')->default(0)->after('description');
+            $table->string('colour')->default('rgb(255,255,255)')->after('isArchived');
         });
     }
 
@@ -26,7 +26,7 @@ class AddPinToNotes extends Migration
     public function down()
     {
         Schema::table('notes', function (Blueprint $table) {
-            $table->dropColumn('pin');
+            $table->dropColumn('colour');
         });
     }
 }

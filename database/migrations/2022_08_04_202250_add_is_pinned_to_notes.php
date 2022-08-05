@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddArchiveToNotes extends Migration
+class AddIsPinnedToNotes extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddArchiveToNotes extends Migration
     public function up()
     {
         Schema::table('notes', function (Blueprint $table) {
-            $table->boolean('archive')->default(0)->after('pin');
+            $table->boolean('isPinned')->default(0)->after('description');
         });
     }
 
@@ -26,7 +26,7 @@ class AddArchiveToNotes extends Migration
     public function down()
     {
         Schema::table('notes', function (Blueprint $table) {
-            $table->dropColumn('archive');
+            $table->dropColumn('isPinned');
         });
     }
 }

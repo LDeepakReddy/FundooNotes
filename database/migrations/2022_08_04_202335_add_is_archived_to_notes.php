@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColourToNotes extends Migration
+class AddIsArchivedToNotes extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddColourToNotes extends Migration
     public function up()
     {
         Schema::table('notes', function (Blueprint $table) {
-            $table->string('colour')->default('rgb(255,255,255)')->after('archive');
+            $table->boolean('isArchived')->default(0)->after('isPinned');
         });
     }
 
@@ -26,7 +26,7 @@ class AddColourToNotes extends Migration
     public function down()
     {
         Schema::table('notes', function (Blueprint $table) {
-            $table->dropColumn('colour');
+            $table->dropColumn('isArchived');
         });
     }
 }

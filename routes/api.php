@@ -49,4 +49,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::post('colournote', [NoteController::class, 'colourNoteById']);
     Route::get('getallpinnednotes', [NoteController::class, 'getAllPinnedNotes']);
     Route::get('getallarchivednotes', [NoteController::class, 'getAllArchivedNotes']);
+    Route::post('trashNoteById', [NoteController::class, 'trashNoteById']);
+    Route::post('restoreNoteById', [NoteController::class, 'restoreNoteById']);
+    Route::get('getAllTrashedNotes', [NoteController::class, 'getAllTrashedNotes']);
 });
