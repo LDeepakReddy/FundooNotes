@@ -10,9 +10,24 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\LabelNotes;
 use Illuminate\Support\Facades\Log;
 use App\Exceptions\FundooNotesException;
+use Illuminate\Support\Facades\DB;
 
 class NoteController extends Controller
 {
+    public static $colours  =  array(
+        // 'green' => '#ADFF2F',
+        // 'red' => '#FF6347',
+        // 'blue' => '#728FCE',
+        // 'yellow' => '#FFFF00',
+        // 'grey' => '#D3D3D3',
+        // 'purple' => '#D16587',
+        // 'brown' => '#E2A76F',
+        // 'orange' => '#FF4500',
+        // 'pink' => '#F9A7B0',
+
+        // 'teal' => '#43C6DB',
+        // 'white' => '#ffffff',
+    );
 
     /**
      * @OA\Post(
@@ -645,71 +660,7 @@ class NoteController extends Controller
         }
     }
 
-    function colourNoteById(Request $request)
-    {
-        try {
 
-            $validator = Validator::make($request->all(), [
-                'id' => 'required|integer',
-                'colour' => 'required|string'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json($validator->errors()->toJson(), 400);
-            }
-
-            $noteObject = new Note();
-            $currentUser = JWTAuth::authenticate($request->token);
-            $note = $noteObject->noteId($request->id);
-
-
-            if (!$note) {
-                Log::error('Notes Not Found', ['user' => $currentUser, 'id' => $request->id]);
-                return response()->json([
-                    'status' => 404,
-                    'message' => 'Notes not Found'
-                ], 404);
-            }
-
-            $colours  =  array(
-                'green' => 'rgb(0,255,0)',
-                'red' => 'rgb(255,0,0)',
-                'blue' => 'rgb(0,0,255)',
-                'yellow' => 'rgb(255,255,0)',
-                'grey' => 'rgb(128,128,128)',
-                'purple' => 'rgb(128,0,128)',
-                'brown' => 'rgb(165,42,42)',
-                'orange' => 'rgb(255,165,0)',
-                'pink' => 'rgb(255,192,203)',
-                'black' => 'rgb(0,0,0)',
-                'silver' => 'rgb(192,192,192)',
-                'teal' => 'rgb(0,128,128)',
-                'white' => 'rgb(255,255,255)',
-            );
-
-            $colour_name = strtolower($request->colour);
-
-            if (isset($colours[$colour_name])) {
-                $note->colour = $colours[$colour_name];
-                $note->save();
-
-                Log::info('notes coloured', ['user_id' => $currentUser, 'note_id' => $request->id]);
-                return response()->json([
-                    'status' => 201,
-                    'message' => 'Note coloured Sucessfully'
-                ], 201);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Colour Not Specified in the List'
-                ], 400);
-            }
-        } catch (FundooNotesException $exception) {
-            return response()->json([
-                'message' => $exception->message()
-            ], $exception->statusCode());
-        }
-    }
 
     function getAllPinnedNotes()
     {
@@ -791,13 +742,13 @@ class NoteController extends Controller
                 // if ($note->isPinned == 1) {
                 //     $note->isPinned = 0;
                 //     $note->save();
-                    
+
                 // }
                 if ($note->isArchived == 1) {
                     $note->isArchived = 0;
                     $note->save();
                 }
-                
+
                 $note->isTrashed = 1;
                 $note->save();
 
@@ -879,5 +830,21 @@ class NoteController extends Controller
                 'message' => $exception->message()
             ], $exception->statusCode());
         }
+    }
+
+   
+    public function colourNoteById(Request $request,)
+    {
+        $request->validate([
+            'id' => 'required',
+            'colour' => 'required',
+            
+        ]);
+
+        $data = DB::table('notes')->where('id', $request->id)->update(['colour' => $request->colour]);
+        if (!$data) {
+            Log::channel('custom')->error("You entered invalid id");
+        }
+        return response()->json(['data' => $data, 'success' => 200]);
     }
 }

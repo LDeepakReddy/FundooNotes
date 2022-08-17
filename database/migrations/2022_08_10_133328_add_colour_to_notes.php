@@ -14,7 +14,7 @@ class AddColourToNotes extends Migration
     public function up()
     {
         Schema::table('notes', function (Blueprint $table) {
-            $table->string('colour')->default('rgb(255,255,255)')->after('isArchived');
+            $table->string('colour')->default('#ffffff')->after('isArchived');
         });
     }
 
